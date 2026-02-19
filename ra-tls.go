@@ -323,21 +323,17 @@ func (iss *RATLSIssuer) Issue(ctx context.Context, csr *x509.CertificateRequest)
 		zap.String("creation_time", creationTimeStr),
 		zap.String("report_data_algo", "SHA-512(SHA-256(pubkey) || time)"))
 
-	// -- 5. Retrieve the private key from our ephemeral store -
-	ecPub, ok := csr.PublicKey.(*ecdsa.PublicKey)
-	if !ok {
+	// -- 5. Verify the CSR carries an ECDSA public key --------
+	if _, ok := csr.PublicKey.(*ecdsa.PublicKey); !ok {
 		return nil, fmt.Errorf("ra_tls: expected ECDSA public key in CSR, got %T", csr.PublicKey)
 	}
-	fp, err := pubKeyFingerprint(ecPub)
-	if err != nil {
-		return nil, fmt.Errorf("ra_tls: failed to fingerprint CSR public key: %w", err)
+
+	// If GenerateKey was used, clean up the ephemeral store entry.
+	if ecPub, ok := csr.PublicKey.(*ecdsa.PublicKey); ok {
+		if fp, err := pubKeyFingerprint(ecPub); err == nil {
+			iss.keys.LoadAndDelete(fp)
+		}
 	}
-	keyVal, loaded := iss.keys.LoadAndDelete(fp)
-	if !loaded {
-		return nil, fmt.Errorf("ra_tls: no private key found for CSR public key; " +
-			"ensure this issuer's GenerateKey is used as the key source")
-	}
-	_ = keyVal.(*ecdsa.PrivateKey) // type-assert to ensure correctness
 
 	// -- 6. Build the X.509 certificate -----------------------
 	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
