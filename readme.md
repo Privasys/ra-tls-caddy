@@ -17,7 +17,7 @@ This module will serve an x509 certificate extended with an attribute for the TE
 | `tdx`     | Intel TDX        | Supported |
 | `sev-snp` | AMD SEV-SNP     | Planned   |
 
-The hardware-specific logic is abstracted behind the `Attester` interface ([attester.go](attester.go)). Each backend lives in its own file (e.g. [attester_tdx.go](attester_tdx.go)) and registers itself via `init()`.
+The hardware-specific logic is abstracted behind the `Attester` interface ([attester.go](src/attester.go)). Each backend lives in its own file (e.g. [attester_tdx.go](src/attester_tdx.go)) and registers itself via `init()`.
 
 ## How It Works
 
@@ -56,10 +56,17 @@ This certificate is **not cached** — each challenge produces a unique response
 First, build the Go fork:
 
 ```bash
+# Install official Go first (needed as bootstrap compiler)
+wget https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz
+rm go1.24.0.linux-amd64.tar.gz
+
+# Clone and build the Privasys Go fork
 git clone -b ratls https://github.com/Privasys/go.git ~/go-ratls
+export GOROOT_BOOTSTRAP=/usr/local/go
 cd ~/go-ratls/src && ./make.bash
 export GOROOT=~/go-ratls
-export PATH=$GOROOT/bin:$PATH
+export PATH=$GOROOT/bin:$HOME/go/bin:$PATH
 ```
 
 Then build Caddy with the RA-TLS module:
@@ -68,7 +75,7 @@ Then build Caddy with the RA-TLS module:
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
 git clone https://github.com/Privasys/ra-tls-caddy.git
-cd ra-tls-caddy
+cd ra-tls-caddy/src
 xcaddy build --with github.com/Privasys/ra-tls-caddy=.
 ```
 
@@ -174,9 +181,15 @@ A relying party verifying an RA-TLS certificate should:
 
 ## Adding a New Backend
 
-1. Create `attester_<name>.go` implementing the `Attester` interface.
+1. Create `src/attester_<name>.go` implementing the `Attester` interface.
 2. Register it in an `init()` function: `RegisterAttester("<name>", func() Attester { return new(MyAttester) })`
 3. The new backend is immediately available via `backend <name>` in the Caddyfile.
+
+## Installation Guides
+
+- [Google Cloud (TDX)](install/Google%20Cloud.md) — GCP Confidential VMs (c3-standard, DCesv5)
+- [Azure (TDX)](install/Azure.md) — Azure DCesv5/DCedsv5 Confidential VMs
+- [OVH Cloud (Bare Metal)](install/OVH%20Cloud.md) — Dedicated servers with QEMU/KVM TDX guests
 
 ## Third-Party Licenses & Acknowledgments
 
