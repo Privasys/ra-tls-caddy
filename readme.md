@@ -1,5 +1,7 @@
 # RA-TLS Issuer for Caddy
 
+![AGPLv3 License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)
+
 A Caddy `tls.issuance` module (`ra_tls`) that produces **RA-TLS certificates** for Confidential Computing.
 
 ## Extended certificate
@@ -39,7 +41,7 @@ When a TLS client sends a **RA-TLS challenge** in its ClientHello (extension `0x
 
 This certificate is **not cached** — each challenge produces a unique response.
 
-> **Note:** This branch requires the [Privasys/go fork](https://github.com/Privasys/go/tree/ratls) which adds `ClientHelloInfo.RATLSChallenge` to `crypto/tls`, enabling challenge-response attestation. An upstream PR is open at [golang/go#77714](https://github.com/golang/go/pull/77714). The code references `hello.RATLSChallenge` directly and **will not compile with standard Go**.
+> **Note:** This branch requires the [Privasys/go fork](https://github.com/Privasys/go/tree/ratls) ([initial commit](https://github.com/Privasys/go/commit/1de8bde833631316999b14a67f1551c14e69206f)) which adds `ClientHelloInfo.RATLSChallenge` to `crypto/tls`, enabling challenge-response attestation. An upstream PR is open at [golang/go#77714](https://github.com/golang/go/pull/77714). The code references `hello.RATLSChallenge` directly and **will not compile with standard Go**.
 
 ## Requirements
 
@@ -47,7 +49,7 @@ This certificate is **not cached** — each challenge produces a unique response
 - Backend-specific support:
   - `tdx` — Kernel configfs-tsm (`/sys/kernel/config/tsm/report`)
 - An **intermediary CA** certificate and private key (private PKI)
-- [Privasys/go fork](https://github.com/Privasys/go/tree/ratls) (`ratls` branch) and [xcaddy](https://github.com/caddyserver/xcaddy)
+- [Privasys/go fork](https://github.com/Privasys/go/tree/ratls) (`ratls` branch — [initial commit](https://github.com/Privasys/go/commit/1de8bde833631316999b14a67f1551c14e69206f)) and [xcaddy](https://github.com/caddyserver/xcaddy)
 
 ## Building
 
@@ -65,9 +67,9 @@ Then build Caddy with the RA-TLS module:
 ```bash
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
-git clone https://github.com/Privasys/caddy-ra-tls-module.git
-cd caddy-ra-tls-module
-xcaddy build --with github.com/Privasys/caddy-ra-tls-module=.
+git clone https://github.com/Privasys/ra-tls-caddy.git
+cd ra-tls-caddy
+xcaddy build --with github.com/Privasys/ra-tls-caddy=.
 ```
 
 > **Note:** The `=.` suffix tells xcaddy to use the local directory as the module source. The import path before `=` must match the `module` directive in `go.mod`. If you are working from a fork, update `go.mod` accordingly.
@@ -187,8 +189,22 @@ This project makes use of the following open source libraries:
 
 Please refer to each project for their respective license terms.
 
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Security
+
+If you discover a security vulnerability, please report it responsibly. See [SECURITY.md](SECURITY.md) for details.
+
 ## License
 
 This project is licensed under the [GNU Affero General Public License v3 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html).
 
-![AGPLv3 License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)
+You are free to use, modify, and distribute this software under the terms of the AGPL-3.0. Any modified versions or services built on this software that are accessible over a network **must** make the complete source code available under the same license.
+
+### Commercial Licensing
+
+For commercial, closed-source, or proprietary use that is not compatible with the AGPL-3.0, a separate **commercial license** is available.
+
+Please contact **legal@privasys.org** for licensing enquiries.

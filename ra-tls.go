@@ -87,7 +87,7 @@
 //
 // # Build
 //
-//	xcaddy build --with github.com/Privasys/caddy-ra-tls-module=.
+//	xcaddy build --with github.com/Privasys/ra-tls-caddy=.
 package ratls
 
 import (
