@@ -122,7 +122,7 @@ func init() {
 // certificate creation time into the ReportData hash. It yields minute-
 // precision UTC strings like "2026-02-18T14:30Z", which a verifier can
 // reproduce from the certificate's NotBefore field.
-const reportTimeFormat = "2026-01-02T15:04Z"
+const reportTimeFormat = "2006-01-02T15:04Z"
 
 // RATLSIssuer is a Caddy TLS issuance module that produces RA-TLS
 // certificates for Confidential VMs.
